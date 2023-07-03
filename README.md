@@ -8,7 +8,7 @@ Ai-Thinker A9 (A9G) GSM module library for microcontrollers (initially for ESP32
   *  Supports hard reset with power enable pin, if the power of the module is controlled via switch (ex. MOSFET)
   *  Error and info logging
 
-👷‍♂️Planned features:
+⏳Planned features:
   *  Surrounding cell stations' information
   
 ⛔Not supported: 
