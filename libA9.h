@@ -2,7 +2,6 @@
 *  Author: Talha Duman
 */
 
-
 #include <stdint.h>
 #include "driver/uart.h"
 
