@@ -1,5 +1,6 @@
 # libA9
-Ai-Thinker A9 (A9G) GSM module library for microcontrollers (initially for ESP32 family on ESP-IDF framework)
+Ai-Thinker A9(A9G) is a fairly low priced GSM module with capability of GPRS and GPS(A9G).  
+This library implements several features of the module for some microcontroller families (initially for ESP32 family on ESP-IDF framework).
 
 ✅Current features:
   *  No AT commands needed
