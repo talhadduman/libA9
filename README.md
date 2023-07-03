@@ -27,5 +27,7 @@ Ai-Thinker A9 (A9G) GSM module library for microcontrollers (initially for ESP32
   5. shuts the module down  
      ```gsm.stop();```  
 
+[![](https://visitcount.itsvg.in/api?id=libA9&label=Repo%20views&icon=8&pretty=false)](https://visitcount.itsvg.in)
+
 ## Contact me
 Feel free to contact me: talhadduman[at]gmail[dot]com
