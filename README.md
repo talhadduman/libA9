@@ -32,4 +32,4 @@ This library implements several features of the module for some microcontroller 
 [![](https://visitcount.itsvg.in/api?id=libA9&label=Repo%20views&icon=8)](https://visitcount.itsvg.in)
 
 ## Contact me
-Feel free to contact me: talhadduman[at]gmail[dot]com
+Feel free to email me: talhadduman[at]gmail[dot]com
