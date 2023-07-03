@@ -18,7 +18,7 @@ Ai-Thinker A9 (A9G) GSM module library for microcontrollers (initially for ESP32
 ## How to use
   1. include the header file  
      ```#include "libA9.h"```  
-  2. create an A9 object with desired parameters (uart_num, tx_pin, rx_pin, power_enable_pin, invert_pwr_en_pin, APN)  
+  2. create A9 object with your parameters (uart_num, tx_pin, rx_pin, power_enable_pin, invert_pwr_en_pin, APN)  
      ```A9 gsm = A9(..);```  
   3. power on and get the module ready for HTTP requests, returns 1 if succeeded  
      ```gsm.start();```  
