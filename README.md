@@ -11,6 +11,8 @@ This library implements several features of the module for some microcontroller 
 
 ⏳Planned features:
   *  Surrounding cell stations' information
+  *  Getting/setting IMEI numbers
+  *  Getting GSM network time
   
 ⛔Not supported: 
   *  SMS
