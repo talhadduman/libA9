@@ -10,7 +10,7 @@ This library implements several features of the module for some microcontroller 
   *  Error and info logging
 
 ⏳Planned features:
-  *  Surrounding cell stations' information
+  *  Surrounding cell station information
   *  Getting/setting IMEI numbers
   *  Getting GSM network time
   
