@@ -23,6 +23,8 @@ class A9{
         int16_t http_post(const char *URL, const char *body);
         char* read_http_response();
         uint32_t get_gsm_time();
+        char* get_imei();
+        int8_t set_imei(char* IMEI);
         void stop();
     private:
         uart_port_t uart_num;
@@ -42,6 +44,7 @@ class A9{
         int invert_pwr_en_pin;
 
         char APN[32];
+        char IMEI[32];
 
         char receive_buffer[A9_UART_RX_BUFFER_SIZE];        
         char http_buffer[A9_HTTP_BUFFER_SIZE];

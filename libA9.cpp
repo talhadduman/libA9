@@ -283,14 +283,14 @@ int16_t A9::http_post(const char* URL, const char* body){
 }
 
 /*
-*   Returns a pointer to the response body of the recent request.
+*   Returns a pointer to the response body of the recent request. Data stays valid until a new HTTP request. 
 */
 char* A9::read_http_response(){
     return http_response;
 }
 
 /*
-*   Get GSM network time in Unix seconds timestamp.
+*   Get GSM network time in Unix seconds timestamp. Returns 0 on fail.
 */
 uint32_t A9::get_gsm_time(){
 
@@ -346,6 +346,64 @@ uint32_t A9::get_gsm_time(){
 }
 
 /*
+    Get IMEI number of module. Returns null on fail.
+*/
+char* A9::get_imei(){
+    flush_serial();
+    send_to_serial("AT+EGMR=2,7\r");
+    int8_t stat = wait_for_pattern("+EGMR:",2000);
+
+    if(stat == -1){
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"Get IMEI timeout");
+        #endif
+        return NULL; //Get IMEI timeout
+    }
+    stat = sscanf(get_received_line(), "+EGMR:%15s", IMEI);
+
+    if (stat != 1)
+    {
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"Get IMEI parsing error");
+        #endif
+        return NULL; //Parsing error  
+    }
+
+    flush_serial();
+    return IMEI;
+}
+
+/*
+    Set the IMEI number of module, then shuts the module off. Returns 0 on success.
+    After the use of this, module has to be started again to make requests.
+    IMEI: 15-digit numerical IMEI number. Ex. 867959030000001
+*/
+int8_t A9::set_imei(char* IMEI){
+    
+    if (strlen(IMEI) != 15)
+    {
+        return -1; //Invalid length
+    }
+
+    char command[64];    
+    sprintf(command,"AT+EGMR=1,7,\"%s\"\r",IMEI);
+
+    flush_serial();
+    send_to_serial(command);
+    int8_t stat = wait_for_pattern("OK",2000);
+
+    if(stat == -1){
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"Set IMEI timeout");
+        #endif
+        return -2; //Set IMEI timeout
+    }
+
+    stop();
+    return 0;
+}
+
+/*
 *   Disable the power of module and flush incoming serial buffer.
 */
 void A9::stop(){
@@ -367,7 +425,7 @@ void A9::flush_serial(){
     uart_flush_input(uart_num);
 }
 
-//Waits until given pattern is received. Returns 1 when success and returns -1 when timeout
+//Waits until given pattern is received. Returns 0 when success and returns -1 when timeout
 int8_t A9::wait_for_pattern(const char *pattern, uint32_t timeout_ms){
     
     receive_buffer[0] = '\0';
