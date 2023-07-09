@@ -3,6 +3,7 @@
 */
 
 #include <stdint.h>
+#include <time.h>
 #include "driver/uart.h"
 
 //Size of the serial RX circular buffer. Small sizes may cause long responses to be partitially lost. (Default of 2048)
@@ -21,6 +22,7 @@ class A9{
         int16_t http_get(const char *URL);
         int16_t http_post(const char *URL, const char *body);
         char* read_http_response();
+        uint32_t get_gsm_time();
         void stop();
     private:
         uart_port_t uart_num;
@@ -44,6 +46,9 @@ class A9{
         char receive_buffer[A9_UART_RX_BUFFER_SIZE];        
         char http_buffer[A9_HTTP_BUFFER_SIZE];
         char *http_response;
+
+        uint32_t sync_mcu_timestamp;
+        uint32_t sync_unix_timestamp;
 
         void send_to_serial(const char* str);
         void flush_serial();

@@ -50,6 +50,9 @@ A9::A9(uart_port_t uart_num, int tx_pin, int rx_pin, int power_enable_pin, int i
         ESP_ERROR_CHECK(gpio_config(&pin_config));
         module_power_off();
     }
+
+    sync_mcu_timestamp = 0;
+    sync_unix_timestamp = 0;
 }
 
 /*
@@ -284,6 +287,62 @@ int16_t A9::http_post(const char* URL, const char* body){
 */
 char* A9::read_http_response(){
     return http_response;
+}
+
+/*
+*   Get GSM network time in Unix seconds timestamp.
+*/
+uint32_t A9::get_gsm_time(){
+
+    if(sync_unix_timestamp != 0){ //Already syncronised, calculate & return current timestamp
+    return ((millis() - sync_mcu_timestamp)/1000) + sync_unix_timestamp;
+    }
+
+    flush_serial();
+    send_to_serial("AT+CCLK?\r");
+    int32_t command_time = millis(); //in MCU milliseconds
+
+    int8_t stat;
+    stat = wait_for_pattern("+CCLK:",5000);
+    if (stat == -1)
+    {
+        return 0; //Cannot get time.
+    }
+
+    uint8_t years_since_2000;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hours;
+    uint8_t minutes;
+    uint8_t seconds;
+    stat = sscanf(get_received_line(), "+CCLK: \"%hhd/%hhd/%hhd,%hhd:%hhd:%hhd%*s\"", &years_since_2000, &month, &day, &hours, &minutes, &seconds);
+
+    if(stat != 6){
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"GSM time parsing error");
+        #endif
+        return 0; //Time parsing error
+    }
+    
+    struct tm gmt_time = {
+        .tm_sec = seconds,
+        .tm_min = minutes,
+        .tm_hour = hours,
+        .tm_mday = day,
+        .tm_mon = (month - 1),
+        .tm_year = (years_since_2000 + 100),
+        .tm_wday = 0,
+        .tm_yday = 0,
+        .tm_isdst = 0};
+
+    uint32_t gsm_time = (mktime(&gmt_time)); //in Unix seconds
+
+    //Syncronising time
+    sync_mcu_timestamp = command_time;
+    sync_unix_timestamp = gsm_time;
+
+    //Calculate & return current timestamp
+    return ((millis() - sync_mcu_timestamp)/1000) + sync_unix_timestamp;
 }
 
 /*
