@@ -5,18 +5,19 @@ This library implements several features of the module for some microcontroller 
 ✅Current features:
   *  No AT commands needed
   *  Simple methods for HTTP GET/POST requests (A9/A9G does not support HTTPS)
-  *  Module gets ready to make requests with only one method ".start()"
+  *  Module gets ready to make HTTP requests with only one method ".start()"
+  *  Supoorts GSM network time in Unix timestamp format
   *  Supports hard reset with power enable pin, if the power of the module is controlled via switch (ex. MOSFET)
-  *  Error and info logging
+  *  Optional Error and info logging
 
 ⏳Planned features:
   *  Surrounding cell station information
   *  Getting/setting IMEI numbers
-  *  Getting GSM network time
-  
+
 ⛔Not supported: 
   *  SMS
   *  Calls
+  *  TCP/IP socket connections
 
 ## How to use
   1. include the header file  
