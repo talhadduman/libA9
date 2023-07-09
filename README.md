@@ -6,7 +6,7 @@ This library implements several features of the module for some microcontroller 
   *  No AT commands needed
   *  Simple methods for HTTP GET/POST requests (A9/A9G does not support HTTPS)
   *  Module gets ready to make HTTP requests with only one method ".start()"
-  *  Supoorts GSM network time in Unix timestamp format
+  *  Supports GSM network time in Unix timestamp format
   *  Getting and setting IMEI number
   *  Supports hard reset with power enable pin, if the power of the module is controlled via switch (ex. MOSFET)
   *  Optional error and info logging
