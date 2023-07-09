@@ -149,7 +149,7 @@ int8_t A9::start(){
 int16_t A9::http_get(const char* URL){
     
     sprintf(http_buffer,"AT+HTTPGET=\"%s\"\r",URL); //Using http_buffer for storing AT commands to save RAM
-    
+    flush_serial();
     send_to_serial(http_buffer);
     int8_t stat = wait_for_pattern("OK",45000);
 
@@ -219,7 +219,7 @@ int16_t A9::http_get(const char* URL){
 int16_t A9::http_post(const char* URL, const char* body){
     
     sprintf(http_buffer,"AT+HTTPPOST=\"%s\",\"text/plain\",\"%s\"\r",URL,body); //Using http_buffer for storing AT commands to save RAM
-    
+    flush_serial();
     send_to_serial(http_buffer);
     int8_t stat = wait_for_pattern("OK",45000);
 
