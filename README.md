@@ -1,18 +1,17 @@
 # libA9
 Ai-Thinker A9(A9G) is a fairly low priced GSM module with capability of GPRS and GPS(GPS only exists in A9G).  
-This library implements several features of the module for some microcontroller families (initially for ESP32 family on ESP-IDF framework).
+This library implements several features of the module for some microcontroller families (initially for ESP32 family on ESP-IDF framework).  
+No AT commands needed, simple to make HTTP requests, module gets ready with a single method.
 
 ✅Current features:
-  *  No AT commands needed
-  *  Simple methods for HTTP GET/POST requests (A9/A9G does not support HTTPS)
-  *  Module gets ready to make HTTP requests with only one method ".start()"
-  *  Supports GSM network time in Unix timestamp format
-  *  Getting and setting IMEI number
-  *  Supports hard reset with power enable pin, if the power of the module is controlled via switch (ex. MOSFET)
+  *  HTTP GET/POST requests (A9/A9G does not support HTTPS)
+  *  Fetch GSM network time in UNIX timestamp
+  *  Get & set IMEI number
+  *  Optional hard reset with power enable pin (when power of the module is switched via MOSFET)
   *  Optional error and info logging
 
 ⏳Planned features:
-  *  Surrounding cell station information
+  *  Fetch surrounding cell tower information
 
 ⛔Not supported: 
   *  SMS
@@ -35,4 +34,4 @@ This library implements several features of the module for some microcontroller 
 [![](https://visitcount.itsvg.in/api?id=libA9&label=Repo%20views&icon=8)](https://visitcount.itsvg.in)
 
 ## Contact me
-Feel free to email me: talhadduman[at]gmail[dot]com
+- email: talhadduman[at]gmail[dot]com
