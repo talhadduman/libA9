@@ -7,11 +7,12 @@ No AT commands needed, simple to make HTTP requests, module gets ready with a si
   *  HTTP GET/POST requests (A9 / A9G does not support HTTPS)
   *  Fetch GSM network time in UNIX timestamp
   *  Get & set IMEI number
+  *  Fetch surrounding cell tower information
   *  Optional hard reset with power enable pin (when power of the module is switched via MOSFET)
   *  Optional error and info logging
 
 ⏳Planned features:
-  *  Fetch surrounding cell tower information
+  *...
 
 ⛔Not supported: 
   *  SMS

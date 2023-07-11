@@ -2,13 +2,6 @@
 *  Author: Talha Duman
 */
 
-#include <string.h>
-#include "driver/gpio.h"
-#include "esp_timer.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 #include "libA9.h"
 
 #define A9_LOGGING_TAG "libA9"
@@ -189,7 +182,7 @@ int16_t A9::http_get(const char* URL){
     if(response_code != 200)
     {
         #ifdef A9_ENABLE_LOGS
-            ESP_LOGI(A9_LOGGING_TAG,"HTTP bad request:%d",response_code);
+            ESP_LOGI(A9_LOGGING_TAG,"HTTP request failed. Status code:%d",response_code);
         #endif
         return response_code;
     }
@@ -259,7 +252,7 @@ int16_t A9::http_post(const char* URL, const char* body){
     if(response_code != 200)
     {
         #ifdef A9_ENABLE_LOGS
-            ESP_LOGI(A9_LOGGING_TAG,"HTTP bad request:%d",response_code);
+            ESP_LOGI(A9_LOGGING_TAG,"HTTP request failed. Status code:%d",response_code);
         #endif
         return response_code;
     }
@@ -374,7 +367,8 @@ char* A9::get_imei(){
 }
 
 /*
-    Set the IMEI number of module, then shuts the module off. Returns 0 on success.
+    Set the IMEI number of module, then shuts the module off. 
+    Returns 0 on success.
     After the use of this, module has to be started again to make requests.
     IMEI: 15-digit numerical IMEI number. Ex. 867959030000001
 */
@@ -382,6 +376,9 @@ int8_t A9::set_imei(char* IMEI){
     
     if (strlen(IMEI) != 15)
     {
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"Invalid IMEI lenght");
+        #endif
         return -1; //Invalid length
     }
 
@@ -401,6 +398,123 @@ int8_t A9::set_imei(char* IMEI){
 
     stop();
     return 0;
+}
+
+/*
+    Get cell tower information in CSV format with order of MCC,MNC,LAC,CID,RxLevel.
+    Maximum of 5 cell towers depending on signal quality.
+    Data stays valid until new cell info request is made.
+    Returns NULL on error.
+*/
+char* A9::get_cell_info(){
+    
+    cell_info[0] = '\0';
+
+    flush_serial();
+    send_to_serial("AT+CCED=0,1\r");
+    int8_t stat = wait_for_pattern("+CCED:", 5000);
+
+    if (stat == -1)
+    {
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"Get cell info timeout");
+        #endif
+        return NULL; //Timeout
+    }
+    
+    char str_buf[128];
+
+    uint32_t mcc;
+    uint32_t mnc;
+    uint32_t lac;
+    uint32_t cid;
+    uint32_t rx_lev;
+
+    char* index = strtok(get_received_line(),":");
+    if (index == NULL) return NULL; //Parsing error
+
+    index = strtok(NULL,",");
+    if (index == NULL) return NULL; //Parsing error
+    sscanf(index,"%" SCNd32 ",%*s",&mcc);
+
+    index = strtok(NULL,",");
+    if (index == NULL) return NULL; //Parsing error
+    uint32_t temp;
+    sscanf(index,"%" SCNd32 ",%*s",&temp);
+    mnc = temp/10;
+
+    index = strtok(NULL,",");
+    if (index == NULL) return NULL; //Parsing error
+    sscanf(index,"%" SCNx32 ",%*s",&lac);
+    
+    index = strtok(NULL,",");
+    if (index == NULL) return NULL; //Parsing error
+    sscanf(index,"%" SCNx32 ",%*s",&cid);
+
+    index = strtok(NULL,",");
+    index = strtok(NULL,",");
+    if(index == NULL) return NULL; //Parsing error
+    sscanf(index,"%" SCNd32 ",%*s",&rx_lev);
+
+    sprintf(str_buf, "%" PRId32 ",%" PRId32",%" PRIx32 ",%" PRIx32 ",%" PRId32 "\n", mcc, mnc, lac, cid, rx_lev);
+    strcat(cell_info,str_buf);
+
+    flush_serial();
+    send_to_serial("AT+CCED=0,2\r");
+    stat = wait_for_pattern("+CCED:", 5000);
+
+    if (stat == -1)
+    {
+        #ifdef A9_ENABLE_LOGS
+            ESP_LOGI(A9_LOGGING_TAG,"Get cell info timeout");
+        #endif
+        return NULL; //Timeout
+    }
+
+    index = strtok(get_received_line(), ":");
+
+    uint16_t comma_count = 0;
+    uint16_t i = 0;
+    while (index[i] != '\0') {
+        if (index[i] == ',') {
+            comma_count++;
+        }
+        i++;
+    }
+    
+    uint8_t aux_cell_count = ((comma_count + 1) / 6);
+    if (aux_cell_count > 4) aux_cell_count = 4;
+
+    for (uint8_t i = 0; i < aux_cell_count; i++)
+    {
+            index = strtok(NULL, ",");
+            if (index == NULL) break;
+            sscanf(index, "%" SCNd32 ",%*s",&mcc);
+
+            index = strtok(NULL, ",");
+            if (index == NULL) break;
+            uint32_t temp;
+            sscanf(index, "%" SCNd32 ",%*s",&temp);
+            mnc = temp/10;
+
+            index = strtok(NULL,",");
+            if (index == NULL) break;
+            sscanf(index, "%" SCNx32 ",%*s",&lac);
+
+            index = strtok(NULL,",");
+            if (index == NULL) break;
+            sscanf(index, "%" SCNx32 ",%*s",&cid);
+
+            index = strtok(NULL, ",");
+            index = strtok(NULL, ",");
+            if (index == NULL) break;
+            sscanf(index, "%" SCNd32 ",%*s",&rx_lev);
+
+            sprintf(str_buf, "%" PRId32 ",%" PRId32",%" PRIx32 ",%" PRIx32 ",%" PRId32 "\n", mcc, mnc, lac, cid, rx_lev);
+            strcat(cell_info, str_buf);
+    }
+    flush_serial();
+    return cell_info;
 }
 
 /*

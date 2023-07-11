@@ -4,7 +4,14 @@
 
 #include <stdint.h>
 #include <time.h>
+#include <string.h>
+
 #include "driver/uart.h"
+#include "driver/gpio.h"
+#include "esp_timer.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 //Size of the serial RX circular buffer. Small sizes may cause long responses to be partitially lost. (Default of 2048)
 #define A9_UART_RX_BUFFER_SIZE 2048
@@ -13,10 +20,12 @@
 //Comment out below the line if logging is unwanted
 #define A9_ENABLE_LOGS
 //Uncomment below the line to print raw received chars to serial port. 
-//#define A9_ENABLE_RAW_PRINT
+#define A9_ENABLE_RAW_PRINT
 
 class A9{
+
     public:
+
         A9(uart_port_t uart_num, int tx_pin, int rx_pin, int power_enable_pin, int invert_pwr_en_pin, const char* APN);
         int8_t start();
         int16_t http_get(const char *URL);
@@ -25,8 +34,11 @@ class A9{
         uint32_t get_gsm_time();
         char* get_imei();
         int8_t set_imei(char* IMEI);
+        char*  get_cell_info();
         void stop();
+    
     private:
+
         uart_port_t uart_num;
         uart_config_t uart_config = {
             .baud_rate = 115200,
@@ -45,6 +57,7 @@ class A9{
 
         char APN[32];
         char IMEI[32];
+        char cell_info[256];
 
         char receive_buffer[A9_UART_RX_BUFFER_SIZE];        
         char http_buffer[A9_HTTP_BUFFER_SIZE];
