@@ -13,7 +13,7 @@ No AT commands needed, simple to make HTTP requests, module gets ready within a 
   *  Optional error and info logging
 
 ⏳Planned features:
-  *...
+  *  ...
 
 ⛔Not supported: 
   *  SMS
