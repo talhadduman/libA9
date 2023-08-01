@@ -9,7 +9,7 @@ No AT commands needed, simple to make HTTP requests, module gets ready within a 
   *  Fetch GSM network time in UNIX timestamp
   *  Get & set IMEI number
   *  Fetch surrounding cell tower information
-  *  Optional hard reset with power enable pin (when power of the module is switched via MOSFET)
+  *  Optional hard reset with power enable pin (when the module is powered through switch or a MOSFET)
   *  Optional error and info logging
 
 ⏳Planned features:
